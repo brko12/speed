@@ -3,12 +3,12 @@
 ## Repo shape
 One self-contained `index.html`: HTML, exactly one `<style>` block, two inline `<script>`s (script 1 = shell/lobby/audio/wallet/XP persistence; script 2 = game logic). No build step, no `package.json`, no tests/lint. Never add tooling unless asked.
 - `promptForSpeed.md` is the spec (rules, arenas, payouts, palette, fonts).
-- Local audio: `Arcade Groove.mp3`, `Card Rush.mp3`, `firework.wav`, `drawCard.wav`, `flip.wav`, `click.wav`, `WOW.mp3`, `cool.mp3`, `speed.mp3`, `drop.wav`, `gameOver.wav`, `youWin.wav`.
+- Audio files are referenced by **relative path** (`new Audio('Arcade Groove.mp3')`) and must sit next to `index.html`; nothing copies them. Do not rename or move them.
 - Scratch copies (`index.html.bak`, `index.html.test*`) are not part of the game — ignore them.
 - Reference PNGs (`pointinghand_*.png`, UUID pngs) are not loaded by the game.
 
 ## Two scripts, shared global scope
-Script 1 and script 2 share `window`. Top-level `function`/`let` are cross-script accessible (`G`, `sfx`, `refreshIcons`, `setXp`, `levelOf`, etc.).
+Script 1 loads before script 2 and they share `window`. Script 1 defines `G`, `sfx`, `refreshIcons`, `setXp`, `levelOf`, etc. that script 2 uses — do not reorder or split the `<script>` tags. Top-level `function`/`let` are cross-script accessible.
 
 ## Rules
 - No code comments anywhere in `index.html` (HTML, CSS, JS).

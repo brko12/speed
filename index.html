@@ -1041,12 +1041,14 @@ img,.card{image-rendering:pixelated}
 }
 .star{
   position:absolute;
-  width:2px;height:2px;
   background:#fff;
   border-radius:50%;
   box-shadow:0 0 6px rgba(255,255,255,.8);
   opacity:.85;
+  will-change:transform;
 }
+.star.twinkle{animation:twinkle 2s infinite ease-in-out}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
 
 @media (prefers-reduced-motion: reduce){
   .arena-bg{animation:none!important}
@@ -2219,39 +2221,55 @@ function backToLobby(){
 
 let starsRaf = null;
 let stars = [];
+let starW = 0;
+let starH = 0;
+function starResize(){
+  starW = window.innerWidth;
+  starH = window.innerHeight;
+}
 function initStars(){
   const container = $('stars');
   if(!container) return;
   container.innerHTML = '';
   stars = [];
-  const count = 180;
-  const w = window.innerWidth, h = window.innerHeight;
+  const count = 400;
+  starW = window.innerWidth;
+  starH = window.innerHeight;
+  const half = count/2;
   for(let i=0;i<count;i++){
     const el = document.createElement('div');
     el.className = 'star';
-    el.style.left = Math.random()*100 + 'vw';
-    el.style.top = Math.random()*100 + 'vh';
+    const size = 1 + Math.random()*2.5;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.opacity = 0.35 + Math.random()*0.6;
+    if(Math.random() < 0.35) el.classList.add('twinkle');
     const s = 0.15 + Math.random()*0.25;
-    const lx = i < count/2 ? Math.random()*(w*0.5) : (w*0.5 + Math.random()*(w*0.5));
-    stars.push({el:el,x:lx,y:Math.random()*h,speed:s});
+    const leftSide = i < half;
+    const lx = leftSide ? Math.random()*(starW*0.5) : (starW*0.5 + Math.random()*(starW*0.5));
+    stars.push({el:el,x:lx,y:Math.random()*starH,speed:s,left: leftSide});
     container.appendChild(el);
   }
+  window.addEventListener('resize', starResize, {passive:true});
   cancelAnimationFrame(starsRaf);
   animateStars();
 }
 function animateStars(){
   if(!match){ starsRaf = null; return; }
-  const w = window.innerWidth, h = window.innerHeight;
   const rem = 15 - match.draws;
-  let sp = 1.6;
-  if(rem >= 11) sp = 1.6;
-  else if(rem >= 6) sp = 3.4;
-  else if(rem >= 1) sp = 5.6;
-  else sp = 7.8;
+  let sp = 3;
+  if(rem >= 11) sp = 3;
+  else if(rem >= 6) sp = 6;
+  else if(rem >= 1) sp = 9;
+  else sp = 12;
+  const w = starW;
+  const h = starH;
   for(const st of stars){
     st.x += st.speed * sp;
     if(st.x > w + 20){ st.x = -20; st.y = Math.random()*h; }
-    st.el.style.transform = 'translate(' + st.x + 'px,' + st.y + 'px)';
+    st.el.style.transform = 'translate3d(' + st.x + 'px,' + st.y + 'px,0)';
   }
   starsRaf = requestAnimationFrame(animateStars);
 }
@@ -2259,6 +2277,7 @@ function stopStars(){
   cancelAnimationFrame(starsRaf);
   starsRaf = null;
   stars = [];
+  window.removeEventListener('resize', starResize);
   const c = $('stars');
   if(c) c.innerHTML = '';
 }
