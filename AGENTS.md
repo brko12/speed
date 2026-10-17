@@ -1,34 +1,34 @@
 # AGENTS.md
 
 ## Repo shape
-- One self-contained `index.html`: HTML, a single `<style>`, two inline `<script>`s. No build step, no `package.json`, no tests/lint. Never add tooling unless asked.
-- `promptForSpeed.md` is the spec (rules, arenas, payouts, palette, fonts). Loose `Gemini_*.jpg` / `pointinghand_*.png` are reference assets, not loaded by the game.
+One self-contained `index.html`: HTML, exactly one `<style>` block, two inline `<script>`s (script 1 = shell/lobby/audio/wallet/XP persistence; script 2 = game logic). No build step, no `package.json`, no tests/lint. Never add tooling unless asked.
+- `promptForSpeed.md` is the spec (rules, arenas, payouts, palette, fonts).
 - Local audio: `Arcade Groove.mp3`, `Card Rush.mp3`, `firework.wav`, `drawCard.wav`, `flip.wav`, `click.wav`, `WOW.mp3`, `cool.mp3`, `speed.mp3`, `drop.wav`, `gameOver.wav`, `youWin.wav`.
 - Scratch copies (`index.html.bak`, `index.html.test*`) are not part of the game — ignore them.
+- Reference PNGs (`pointinghand_*.png`, UUID pngs) are not loaded by the game.
 
 ## Two scripts, shared global scope
-- Script 1 = shell/lobby/audio/wallet/XP persistence. Script 2 = game logic.
-- Top-level `function`/`let` are cross-script accessible (`G`, `sfx`, `refreshIcons`, `setXp`, `levelOf`, etc.).
-- No code comments anywhere in `index.html` (HTML, CSS, JS). Do not add any.
+Script 1 and script 2 share `window`. Top-level `function`/`let` are cross-script accessible (`G`, `sfx`, `refreshIcons`, `setXp`, `levelOf`, etc.).
+
+## Rules
+- No code comments anywhere in `index.html` (HTML, CSS, JS).
+- Exactly one `<style>` open/close pair. A stray `</style>` renders CSS as visible text.
+- Never name anything `top` — collides with `window.top`, throws SyntaxError, silently kills the script. Pile accessor is `topCard()`.
+- Deck is **52 cards** (4 suits × ranks 1–13) even though `promptForSpeed.md` says 40 — the code's math requires 52.
+- `let muted = false;` must be declared **before** any `muted` usage or a ReferenceError halts all JS.
 
 ## Verifying changes
-- Parse-check both inline `<script>` blocks (silent output = OK):
-  `node -e "const h=require('fs').readFileSync('index.html','utf8');[...h.matchAll(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g)].forEach((m,i)=>{try{new Function(m[1])}catch(e){console.log('script',i+1,e.message)}})"`
-- Keep CSS braces balanced: `{` minus `}` across the single `<style>` block = 0.
-- Headless Chrome check (no server; Chrome won't exit — poll `out.html`, then `pkill -f "user-data-dir=..."`):
-  `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --user-data-dir=/tmp/chrome-profile --window-size=1920,1080 --virtual-time-budget=15000 --dump-dom file:///full/path/index.html > out.html 2>/dev/null &`
-- Timer/interval gameplay is unreliable headless (arena animations eat `--virtual-time-budget`) — force state directly instead of playing.
+Parse-check both inline `<script>` blocks (silent output = OK):
+`node -e "const h=require('fs').readFileSync('index.html','utf8');[...h.matchAll(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g)].forEach((m,i)=>{try{new Function(m[1])}catch(e){console.log('script',i+1,e.message)}})"`
+Keep CSS braces balanced: `{` minus `}` across the single `<style>` block = 0.
 
-## Hard-won gotchas (silent failures)
-- Never name anything `top` — collides with `window.top`, throws SyntaxError, silently kills the script. Pile accessor is `topCard()`.
-- Exactly one `<style>` open/close pair. A stray `</style>` renders game CSS as visible text.
-- Deck is **52 cards** even though promptForSpeed.md says 40 — the code's math requires 52.
-- `let muted = false;` must be declared **before** any `muted` usage or a ReferenceError halts all JS.
-- Screen-shake specificity trap: never add `animation` to `#game` by id — id specificity (1,0,0) beats `.screen-shake` (0,1,0) and shake silently stops.
+Headless Chrome check (no server; Chrome won't exit — poll `out.html`, then `pkill -f "user-data-dir=..."`):
+`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --user-data-dir=/tmp/chrome-profile --window-size=1920,1080 --virtual-time-budget=15000 --dump-dom file:///full/path/index.html > out.html 2>/dev/null &`
+Timer/interval gameplay is unreliable headless (arena animations eat `--virtual-time-budget`) — force state directly instead of playing.
 
 ## Persistence / session reset
-- `localStorage`: `speed_tokens_v1` (tokens), `speed_xp_v1` (total XP; level = `floor(xp/100)+1`), `speed_bg_v1`, `speed_cb_v1`, `speed_name_v1`. Changing a key resets it for everyone.
-- Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `sp_cb_seen`) gate `localStorage` clearing on **browser close only**; refresh preserves data, closing tab clears it.
+`localStorage`: `speed_tokens_v1`, `speed_xp_v1` (level = `floor(xp/100)+1`), `speed_bg_v1`, `speed_cb_v1`, `speed_name_v1`. Changing a key resets it for everyone.
+Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `sp_cb_seen`) gate `localStorage` clearing on **browser close only**; refresh preserves data, closing tab clears it.
 
 ## Interaction model (do not "improve")
 - Clicking a card only selects it; both center piles pulse gold (`pulseGold`) regardless of validity; pile click plays. No validity hints, no auto-play.
