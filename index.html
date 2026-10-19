@@ -21,6 +21,7 @@
   --ink:#020617;
   --muted:#64748b;
   --line:#1e293b;
+  --speed:#38bdf8;
 }
 *{box-sizing:border-box}
 *{cursor:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABDElEQVR4nOWXgQ6EIAiG/Vnv/8rc2rI4BoqFdtv9W1smwheiGUpfLO5RkkUDwa32Y6EHwHzFBJCeCRoxljCvAAjx2wDlfwBwFZ5XB/xkSra7A50lCqcPdzOAJgHzeYnAbGSKp9cAi4D13oH7mjKKONd1kCTWAJqQszcklZEiAa48BecuGsDxewoykDaSqc/chuU3hVoBZuz9WmRQrSzEUgHgBZmdhS1i5BbQAVz7e21LJP3JQatEqr0cgoxnq6KjuRXPyoL2S57dDAjrUEst+/KLJ6Ke9JLTS1K/GLoene/EiFr/ExQZr5ykioJ2YYjdZgSWwpYBCNkXhcAAwK5IIXgnYzNe9o+JDBB6uQ+33HcxYlXy/QAAAABJRU5ErkJggg==") 9 0, pointer!important}
@@ -581,6 +582,33 @@ img,.card{image-rendering:pixelated}
   60%{transform:translate(-1px,1px)}
   80%{transform:translate(1px,-1px)}
 }
+#speedLetters{
+  position:fixed;
+  left:clamp(130px, 16vw, 240px);
+  top:50%;
+  transform:translateY(-50%);
+  z-index:36;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  gap:clamp(6px,1.2vw,14px)
+}
+.speed-letter{
+  font-family:'Press Start 2P',monospace;
+  color:var(--speed);
+  font-size:clamp(34px,8vw,72px);
+  text-shadow:4px 4px 0 var(--ink),0 0 20px rgba(56,189,248,.45);
+  image-rendering:pixelated;
+  opacity:0
+}
+.speed-letter.speed-new{
+  animation:speedLetterIn 240ms cubic-bezier(.2,1.4,.4,1) forwards
+}
+@keyframes speedLetterIn{
+  0%{transform:translate3d(0,12px,0)scale(.6);opacity:0}
+  46%{transform:translate3d(0,-4px,0)scale(1.24);opacity:1}
+  100%{transform:translate3d(0,0,0)scale(1);opacity:1}
+}
 .count-text{
   font-family:'Press Start 2P',monospace;
   font-size:clamp(64px,17vw,150px);
@@ -1000,6 +1028,7 @@ img,.card{image-rendering:pixelated}
   100%{transform:translateY(-32px) scale(.9);opacity:0}
 }
 @media (max-width:640px){
+  #speedLetters{top:64px;transform:none;left:95px;}
   .round-score{top:64px;left:6px;transform:none;padding:7px 9px;gap:4px}
   .tagline{letter-spacing:.12em;font-size:17px}
   .game-top{gap:7px}
@@ -1139,6 +1168,7 @@ img,.card{image-rendering:pixelated}
 </div>
 
 <section id="game" class="hidden">
+  <div id="speedLetters" aria-hidden="true"></div>
   <div class="arena-bg" id="arenaBg" aria-hidden="true">
     <div id="stars" class="stars" aria-hidden="true"></div>
   </div>
@@ -2073,6 +2103,7 @@ function cardHTML(card, extra){
 }
 function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
 function ready(){ return G && G.started && !G.over; }
+const SPEED_SEQ = ['S','P','E','E','D'];
 
 function createState(tier){
   const deck = buildDeck();
@@ -2091,7 +2122,10 @@ function createState(tier){
     stuckSince: null,
     lastPile: -1,
     aiTimer: null,
-    checkTimer: null
+    checkTimer: null,
+    speedActive: false,
+    speedPlayed: 0,
+    speedLetters: []
   };
 }
 
@@ -2145,6 +2179,8 @@ async function startRound(){
   G = createState(match.tier);
   const g = G;
   match.round++;
+  const sc = $('speedLetters');
+  if(sc) sc.innerHTML = '';
   match.xp = 0;
   match.drawXp = 0;
   match.comboXp = 0;
@@ -2564,6 +2600,11 @@ function playFromHand(idx, pileIdx){
   const card = G.pHand[idx];
   if(!card) return false;
   if(!validRank(card.rank, topCard(G.center[pileIdx]).rank)) return false;
+  if(!G.speedActive && (G.pHand.length + G.pDraw.length) === 5){
+    G.speedActive = true;
+    G.speedPlayed = 0;
+    G.speedLetters = []
+  }
   G.pHand.splice(idx, 1);
   G.center[pileIdx].push(card);
   G.selected = null;
@@ -2579,6 +2620,11 @@ function playFromHand(idx, pileIdx){
   gameEl.classList.remove('screen-shake');
   void gameEl.offsetWidth;
   gameEl.classList.add('screen-shake');
+  if(G.speedActive && G.speedPlayed < 5){
+    G.speedPlayed++;
+    G.speedLetters.push(SPEED_SEQ[G.speedPlayed - 1]);
+    appendSpeedLetter(G.speedLetters[G.speedLetters.length - 1])
+  }
   renderAll();
   if(!G.pHand.length && !G.pDraw.length) endGame('you');
   return true;
@@ -2788,7 +2834,7 @@ function finishMatch(){
     setTokens(getTokens() + tier.prize);
     resultCard.classList.add('victory');
     $('resultTitle').textContent = 'VICTORY!';
-    $('resultSub').textContent = '+' + tier.prize + ' TOKENS';
+    $('resultSub').textContent = '+0 TOKENS';
     playYouWinSound();
     match.bonusXp = 10;
     match.xp += 10;
@@ -2808,7 +2854,6 @@ function finishMatch(){
   gameEndOverlay.classList.remove('hidden');
   refreshIcons();
 }
-
 function renderHand(){
   if(G.drawAnim && G.drawAnim.idx >= G.pHand.length) G.drawAnim = null;
   var animIdx = G.drawAnim ? G.drawAnim.idx : -1;
@@ -2907,6 +2952,13 @@ function renderAll(){
   renderCenter();
   renderBackups();
   renderStats();
+}
+function appendSpeedLetter(letter){
+  const el = document.createElement('div');
+  el.className = 'speed-letter speed-new';
+  el.textContent = letter;
+  const container = $('speedLetters');
+  if(container) container.appendChild(el)
 }
 
 handEl.addEventListener('click', e=>{

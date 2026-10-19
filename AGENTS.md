@@ -39,3 +39,12 @@ Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `
 - `renderHand()` runs a FLIP pass: captures each card rect, rebuilds the hand via the existing flex layout, then applies an inverted `translate3d` that transitions out via the existing `.15s` ease-out so existing cards smoothly shift to make room.
 - New card gets `.hand .card.drawing`, positioned from the draw-stack `.draw-stack .card.back` rect to its hand slot, random −18°…18° rotation, `z-index:6`. Travel ≈300ms (`drawTravel` ease-out), then ≈100ms scale overshoot land (`drawLand`). A 420ms timeout removes `.drawing` and inline transforms.
 - Guarded for detached elements and successive draws; does not touch click/hover/play logic or screen-shake/`+1 XP` pop.
+
+## SPEED letter sequence (script 2)
+- Triggered only in `playFromHand()` — the player's successful card-play event. Never in render/draw/hover/frame loops.
+- State lives on `G`: `speedActive`, `speedPlayed`, `speedLetters`. Reset each round in `createState()` (`startRound()`).
+- `const SPEED_SEQ = ['S','P','E','E','D'];` — one letter appended per play while `speedPlayed < 5`; only the new letter animates (`#speedLetters .speed-letter.speed-new`).
+- Container: `#speedLetters` fixed beside `#roundScore` (middle-left). `appendSpeedLetter(letter)` creates one `div`; existing letters stay static.
+- `pDraw` (the deck) decreases **only** in `drawOne()` via `G.pDraw.pop()`. `refill('p')` is never called; `refill('a')` is CPU-only. So deck reaches 0 only through `drawOne`.
+- Player total remaining = `G.pHand.length + G.pDraw.length` (shown in `youRemain`).
+
