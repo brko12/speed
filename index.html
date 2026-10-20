@@ -2959,6 +2959,11 @@ function appendSpeedLetter(letter){
   el.textContent = letter;
   const container = $('speedLetters');
   if(container) container.appendChild(el)
+  if(!muted){
+    const snd = new Audio(letter + '.mp3');
+    snd.volume = 0.6;
+    snd.play().catch(()=>{});
+  }
 }
 
 handEl.addEventListener('click', e=>{

@@ -34,6 +34,11 @@ Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `
 - Clicking a card only selects it; both center piles pulse gold (`pulseGold`) regardless of validity; pile click plays. No validity hints, no auto-play.
 - Drawing is **manual for the human**: `playFromHand` does not refill; player presses **Space** (`drawOne`, refills up to 5). Only the CPU auto-refills (`refill('a')` in `aiAct`). Do not make the player auto-draw.
 
+## Audio
+- Sound files sit next to `index.html` and are loaded by relative path (`new Audio('Arcade Groove.mp3')`); nothing copies them. Do not rename or move them.
+- Per-letter SPEED sounds: `S.mp3`, `P.mp3`, `E.mp3`, `D.mp3` are played in `appendSpeedLetter(letter)` via `new Audio(letter + '.mp3')`, guarded by `if(!muted)`.
+- All `new Audio(...)` calls respect `muted`; `let muted = false;` is declared in script 1 before any `muted` usage.
+
 ## Draw animation (script 2)
 - `drawOne()` sets `G.drawAnim = { idx }` before `renderHand()`.
 - `renderHand()` runs a FLIP pass: captures each card rect, rebuilds the hand via the existing flex layout, then applies an inverted `translate3d` that transitions out via the existing `.15s` ease-out so existing cards smoothly shift to make room.
@@ -44,7 +49,7 @@ Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `
 - Triggered only in `playFromHand()` — the player's successful card-play event. Never in render/draw/hover/frame loops.
 - State lives on `G`: `speedActive`, `speedPlayed`, `speedLetters`. Reset each round in `createState()` (`startRound()`).
 - `const SPEED_SEQ = ['S','P','E','E','D'];` — one letter appended per play while `speedPlayed < 5`; only the new letter animates (`#speedLetters .speed-letter.speed-new`).
-- Container: `#speedLetters` fixed beside `#roundScore` (middle-left). `appendSpeedLetter(letter)` creates one `div`; existing letters stay static.
+- Container: `#speedLetters` fixed beside `#roundScore` (middle-left). `appendSpeedLetter(letter)` creates one `div`; existing letters stay static. Each call also plays `letter + '.mp3'` (S/P/E/E/D), muted-aware.
 - `pDraw` (the deck) decreases **only** in `drawOne()` via `G.pDraw.pop()`. `refill('p')` is never called; `refill('a')` is CPU-only. So deck reaches 0 only through `drawOne`.
 - Player total remaining = `G.pHand.length + G.pDraw.length` (shown in `youRemain`).
 
