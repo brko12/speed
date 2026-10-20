@@ -38,6 +38,7 @@ Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `
 - Sound files sit next to `index.html` and are loaded by relative path (`new Audio('Arcade Groove.mp3')`); nothing copies them. Do not rename or move them.
 - Per-letter SPEED sounds: `S.mp3`, `P.mp3`, `E.mp3`, `D.mp3` are played in `appendSpeedLetter(letter)` via `new Audio(letter + '.mp3')`, guarded by `if(!muted)`.
 - All `new Audio(...)` calls respect `muted`; `let muted = false;` is declared in script 1 before any `muted` usage.
+- Music lifecycle: menu music (`Card Rush.mp3`) starts only on first user interaction via `tryStartMenuMusic` (`{once:true}` document listeners). Tournament music (`Arcade Groove.mp3`) starts in `startMatch()`; `backToLobby()` stops tournament music and restarts menu music. `tryStartMenuMusic` guards with `if(inTournament) return;` so a first click that enters an arena never also starts menu music (event bubbling would otherwise layer both).
 
 ## Draw animation (script 2)
 - `drawOne()` sets `G.drawAnim = { idx }` before `renderHand()`.
@@ -52,4 +53,12 @@ Four `sessionStorage` markers (`sp_xp_seen`, `sp_tokens_seen`, `sp_name_seen`, `
 - Container: `#speedLetters` fixed beside `#roundScore` (middle-left). `appendSpeedLetter(letter)` creates one `div`; existing letters stay static. Each call also plays `letter + '.mp3'` (S/P/E/E/D), muted-aware.
 - `pDraw` (the deck) decreases **only** in `drawOne()` via `G.pDraw.pop()`. `refill('p')` is never called; `refill('a')` is CPU-only. So deck reaches 0 only through `drawOne`.
 - Player total remaining = `G.pHand.length + G.pDraw.length` (shown in `youRemain`).
+
+## Inactivity countdown (script 2)
+- After **5 seconds** of player inactivity (no card played), a countdown bar appears above the player hand (`#countdownWrap`) showing `5 → 4 → 3 → 2 → 1` (`#countdownNum`) with a draining red bar (`#countdownFill`).
+- Timer starts in `startRound()` once `G.started = true`; cleared in `clearTimers()`; guarded by `G.over` so it never fires after round end.
+- Every successful `playFromHand` calls `resetInactivityTimer()` — stops/hides the countdown and restarts the 5s inactivity window. Drawing a card does **not** reset it.
+- Numbers 2 and below turn crimson and pulse (`warn`); number 1 adds a faster pulse + shake (`urgent`).
+- If the countdown reaches `1`, `endGame('ai')` is called (player loses the round) and further plays are blocked by `ready()`.
+- DOM: `#countdownWrap`, `#countdownBar`, `#countdownFill`, `#countdownNum`.
 

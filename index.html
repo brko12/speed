@@ -609,6 +609,13 @@ img,.card{image-rendering:pixelated}
   46%{transform:translate3d(0,-4px,0)scale(1.24);opacity:1}
   100%{transform:translate3d(0,0,0)scale(1);opacity:1}
 }
+@keyframes speedShake{
+  0%,100%{transform:translate(0,0)}
+  20%{transform:translate(1px,-1px)}
+  40%{transform:translate(-1px,1px)}
+  60%{transform:translate(1px,1px)}
+  80%{transform:translate(-1px,-1px)}
+}
 .count-text{
   font-family:'Press Start 2P',monospace;
   font-size:clamp(64px,17vw,150px);
@@ -617,6 +624,32 @@ img,.card{image-rendering:pixelated}
   animation:popIn .4s cubic-bezier(.2,1.6,.4,1);
 }
 .count-text.msg{font-size:clamp(20px,3.6vw,42px);letter-spacing:.08em;text-align:center}
+.countdown-wrap{
+  position:relative;width:min(260px,84vw);margin:0 auto 10px;display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none;z-index:20
+}
+.countdown-bar{
+  width:100%;height:10px;background:#0b1324;border:2px solid var(--ink);
+  box-shadow:inset 0 0 0 2px #1e293b,0 3px 0 var(--ink);position:relative;overflow:hidden
+}
+.countdown-bar::after{
+  content:'';position:absolute;inset:2px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(2,6,23,.55) 0 2px,transparent 2px 8px)
+}
+.countdown-bar i{
+  display:block;position:absolute;left:2px;top:2px;bottom:2px;right:2px;
+  background:repeating-linear-gradient(90deg,#ef4444 0 6px,#b91c1c 6px 12px);
+  box-shadow:0 0 12px rgba(239,68,68,.8);transform-origin:left center;
+  transition:width 1s linear
+}
+.countdown-num{
+  font-family:'Press Start 2P',monospace;font-size:clamp(26px,4vw,38px);
+  color:#fff;text-shadow:-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink),2px 2px 0 var(--ink),0 0 18px currentColor;
+  image-rendering:pixelated;white-space:nowrap
+}
+.countdown-num.warn{color:var(--crimson);animation:countPulse 0.8s steps(2) infinite}
+.countdown-num.urgent{color:var(--crimson);animation:countPulse 0.3s steps(2) infinite,countShake 0.45s infinite}
+@keyframes countPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.18);opacity:.75}}
+@keyframes countShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-1px,0)}75%{transform:translate(1px,0)}}
 #vsOverlay{background:rgba(2,6,23,.9)}
 .vs-card{display:flex;flex-direction:column;align-items:center;gap:clamp(20px,4vh,40px);text-align:center}
 .vs-player{
@@ -1154,6 +1187,7 @@ img,.card{image-rendering:pixelated}
       </ul>
       <p class="rules-note"><b>Example:</b> The middle card is a 7. You have a 6, a 9, and an 8. You can play the 6 or the 8, but not the 9.</p>
       <p class="rules-note main"><b>Main Rule:</b> Play as fast as possible! Both players race to get rid of their cards.</p>
+      <p class="rules-note"><b>Inactivity:</b> If you do not play any card for 5 seconds, a countdown bar appears above your hand counting down from 5 to 1. Play a card to stop it. If it reaches 1, you lose the round.</p>
     </div>
     <div class="rules-panel controls-panel" style="background:var(--navy);border:2px solid #334155;box-shadow:0 4px 0 var(--ink);">
       <h4>Controls</h4>
@@ -1232,6 +1266,10 @@ img,.card{image-rendering:pixelated}
 
   <div class="player-zone">
     <div class="zone-label">YOU <span class="stat-chip" id="youCounts">HAND 5 / DRAW 15</span></div>
+    <div class="countdown-wrap hidden" id="countdownWrap">
+      <div class="countdown-bar" id="countdownBar"><i id="countdownFill"></i></div>
+      <div class="countdown-num" id="countdownNum">5</div>
+    </div>
     <div class="combo-wrap">
       <div class="combo-bar hidden" id="comboBar"><i id="comboFill"></i></div>
       <div class="combo-pop" id="comboPop"></div>
@@ -1417,6 +1455,10 @@ const stuckBanner = $('stuckBanner');
 const flipBtn = $('flipBtn');
 const countdownEl = $('countdown');
 const countText = $('countText');
+const countdownWrap = $('countdownWrap');
+const countdownBar = $('countdownBar');
+const countdownFill = $('countdownFill');
+const countdownNum = $('countdownNum');
 const resultOverlay = $('resultOverlay');
 const gameEndOverlay = $('gameEndOverlay');
 const vsOverlay = $('vsOverlay');
@@ -2063,6 +2105,7 @@ renderLevelBar();
 $('menuMusicVolume').value = Math.round(menuMusicVolume * 100);
 setMenuMusicVolume(menuMusicVolume);
 function tryStartMenuMusic(){
+  if(inTournament) return;
   if(!menuMusic) startMenuMusic();
   document.removeEventListener('click', tryStartMenuMusic);
   document.removeEventListener('keydown', tryStartMenuMusic);
@@ -2210,6 +2253,7 @@ async function startRound(){
   sfx.go();
   renderCenter();
   G.started = true;
+  startInactivityTimer();
   G.checkTimer = setInterval(stuckCheck, 200);
   scheduleAI();
 }
@@ -2234,7 +2278,56 @@ function clearTimers(){
   clearTimeout(G.aiTimer);
   clearInterval(G.checkTimer);
   clearTimeout(G.roundTimer);
+  clearTimeout(G.inactiveTimer);
+  G.inactiveTimer = null;
+  clearInterval(G.countdownInterval);
+  G.countdownInterval = null;
   if(match) clearTimeout(match.comboTimer);
+}
+function startInactivityTimer(){
+  if(!G) return;
+  clearInactivityTimer();
+  G.inactiveTimer = setTimeout(triggerCountdown, 5000);
+}
+function clearInactivityTimer(){
+  if(G && G.inactiveTimer) clearTimeout(G.inactiveTimer);
+  G.inactiveTimer = null;
+}
+function stopCountdown(){
+  G.countdownActive = false;
+  if(G && G.countdownInterval) clearInterval(G.countdownInterval);
+  G.countdownInterval = null;
+  if(countdownWrap) countdownWrap.classList.add('hidden');
+}
+function triggerCountdown(){
+  if(!G || G.over || G.countdownActive) return;
+  G.countdownActive = true;
+  G.countdownNum = 5;
+  if(countdownWrap) countdownWrap.classList.remove('hidden');
+  updateCountdownDisplay();
+  G.countdownInterval = setInterval(()=>{
+    if(!G || G.over){ stopCountdown(); return; }
+    G.countdownNum--;
+    updateCountdownDisplay();
+    if(G.countdownNum <= 1){
+      clearInterval(G.countdownInterval);
+      G.countdownInterval = null;
+      setTimeout(()=>{ stopCountdown(); endGame('ai'); }, 1000);
+    }
+  }, 1000);
+}
+function updateCountdownDisplay(){
+  if(!countdownNum || !G) return;
+  countdownNum.textContent = G.countdownNum;
+  countdownNum.classList.toggle('warn', G.countdownNum <= 2);
+  countdownNum.classList.toggle('urgent', G.countdownNum <= 1);
+  if(countdownFill) countdownFill.style.width = Math.max(0, (G.countdownNum - 1) / 4 * 100) + '%';
+}
+function resetInactivityTimer(){
+  if(G && G.over) return;
+  clearInactivityTimer();
+  stopCountdown();
+  startInactivityTimer();
 }
 function backToLobby(){
   clearTimers();
@@ -2627,6 +2720,7 @@ function playFromHand(idx, pileIdx){
   }
   renderAll();
   if(!G.pHand.length && !G.pDraw.length) endGame('you');
+  resetInactivityTimer();
   return true;
 }
 
@@ -2964,6 +3058,11 @@ function appendSpeedLetter(letter){
     snd.volume = 0.6;
     snd.play().catch(()=>{});
   }
+  setTimeout(()=>{
+    el.style.opacity='1';
+    const d=(0.65+Math.random()*0.1).toFixed(2);
+    el.style.animation='speedShake '+d+'s infinite '+(Math.random()*0.6).toFixed(2)+'s';
+  },240);
 }
 
 handEl.addEventListener('click', e=>{
