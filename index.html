@@ -374,7 +374,7 @@ img,.card{image-rendering:pixelated}
   padding:10px clamp(8px,2vw,20px) 12px;
   overflow:hidden;
 }
-.game-top{display:flex;align-items:center;gap:12px;padding-bottom:7px;border-bottom:2px dashed var(--line)}
+.game-top{display:flex;align-items:center;gap:12px;padding-bottom:7px}
 .badge{
   font-family:'Press Start 2P',monospace;font-size:10px;
   color:var(--navy);background:var(--tc,var(--gold));
@@ -1187,7 +1187,7 @@ img,.card{image-rendering:pixelated}
       </ul>
       <p class="rules-note"><b>Example:</b> The middle card is a 7. You have a 6, a 9, and an 8. You can play the 6 or the 8, but not the 9.</p>
       <p class="rules-note main"><b>Main Rule:</b> Play as fast as possible! Both players race to get rid of their cards.</p>
-      <p class="rules-note"><b>Inactivity:</b> If you do not play any card for 5 seconds, a countdown bar appears above your hand counting down from 5 to 1. Play a card to stop it. If it reaches 1, you lose the round.</p>
+      <p class="rules-note"><b>Inactivity:</b> There is no penalty for inactivity. Take your time — you won't lose the round for waiting.</p>
     </div>
     <div class="rules-panel controls-panel" style="background:var(--navy);border:2px solid #334155;box-shadow:0 4px 0 var(--ink);">
       <h4>Controls</h4>
@@ -2253,7 +2253,7 @@ async function startRound(){
   sfx.go();
   renderCenter();
   G.started = true;
-  startInactivityTimer();
+  syncInactivityTimer();
   G.checkTimer = setInterval(stuckCheck, 200);
   scheduleAI();
 }
@@ -2287,7 +2287,6 @@ function clearTimers(){
 function startInactivityTimer(){
   if(!G) return;
   clearInactivityTimer();
-  G.inactiveTimer = setTimeout(triggerCountdown, 5000);
 }
 function clearInactivityTimer(){
   if(G && G.inactiveTimer) clearTimeout(G.inactiveTimer);
@@ -2328,6 +2327,15 @@ function resetInactivityTimer(){
   clearInactivityTimer();
   stopCountdown();
   startInactivityTimer();
+}
+function syncInactivityTimer(){
+  if(!G || G.over) return;
+  if(hasMove(G.pHand)){
+    if(!G.inactiveTimer && !G.countdownInterval) startInactivityTimer();
+  } else {
+    clearInactivityTimer();
+    stopCountdown();
+  }
 }
 function backToLobby(){
   clearTimers();
@@ -2438,6 +2446,7 @@ function drawOne(){
   sfx.flip();
   renderHand();
   renderStats();
+  syncInactivityTimer();
 }
 
 function triggerDrawMilestone(draws){
@@ -2758,6 +2767,7 @@ function aiAct(){
     sfx.play();
     renderAll();
     if(!G.aHand.length && !G.aDraw.length){ endGame('ai'); return; }
+    syncInactivityTimer();
     scheduleAI();
   }, 150 + Math.random() * 250);
 }
@@ -2807,6 +2817,7 @@ function doFlip(playerClick){
   G.stuckSince = null;
   G.lastPile = -1;
   renderAll();
+  syncInactivityTimer();
 }
 
 function resolveDeadlock(){
