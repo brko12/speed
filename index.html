@@ -112,6 +112,14 @@ img,.card{image-rendering:pixelated}
 .wallet-amount .lucide{width:17px;height:17px;stroke-width:3}
 .wallet-amount.bump{animation:bump .4s}
 @keyframes bump{35%{transform:scale(1.16);color:#34d399}}
+.lives-amount{color:#fff;background:var(--crimson);border:3px solid #7f1d1d;box-shadow:0 4px 0 var(--ink)}
+.lives-amount .lucide{width:17px;height:17px;stroke-width:3;color:#fff}
+.lives-amount.zero{color:#fff;background:#7f1d1d;border-color:#450a0a}
+.lives-amount.zero .lucide{color:#fff}
+.lives-amount.full{color:#fff;background:#b91c1c;border-color:#7f1d1d}
+.lives-amount.full .lucide{color:#fff}
+.lives-bump{animation:livesBump .4s}
+@keyframes livesBump{35%{transform:scale(1.16);color:#fff;box-shadow:0 4px 0 var(--ink), 0 0 25px rgba(239,68,68,.8)}}
 .lobby-main{flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px;padding-top:34px;max-width:1120px;width:100%;margin:0 auto}
 .section-title{
   font-family:'Press Start 2P',monospace;font-size:clamp(12px,2vw,16px);
@@ -326,6 +334,13 @@ img,.card{image-rendering:pixelated}
 .pack.selected{border-color:var(--gold);background:#16213c;box-shadow:0 0 0 2px var(--gold)}
 .pack .lucide{width:20px;height:20px;color:var(--gold);stroke-width:2.5;flex-shrink:0}
 .pack small{display:block;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green);margin-top:6px}
+.pack-life{background:#0b1324;border-color:var(--green);color:var(--green)}
+.pack-life:hover:not(:disabled){border-color:#34d399;background:#16213c;transform:translateY(-2px)}
+.pack-life:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
+.pack-life .lucide{color:var(--green);stroke-width:2.5}
+.pack-life small{color:var(--green)}
+.pack-life:disabled{background:#334155;border-color:#334155;color:#64748b;cursor:not-allowed}
+.pack-life:disabled .lucide{color:#64748b}
 .cb-preview{
   width:40px;height:56px;flex-shrink:0;border:2px solid #0f172a;border-radius:3px;
   display:flex;align-items:center;justify-content:center;
@@ -1143,6 +1158,9 @@ img,.card{image-rendering:pixelated}
       <div class="wallet-amount" id="walletPill">
         <i data-lucide="coins"></i><span id="tokensLobby">50</span>
       </div>
+      <div class="wallet-amount lives-amount" id="livesPill">
+        <i data-lucide="heart"></i><span id="livesLobby">5</span>
+      </div>
       <button class="btn btn-green" id="freeBtn"><i data-lucide="gift"></i> FREE +25</button>
       <button class="btn btn-gold" id="shopBtn"><i data-lucide="shopping-bag"></i> SHOP</button>
       <button class="btn btn-ghost" id="bgBtn" title="Change Background"><i data-lucide="image"></i> BACKGROUND</button>
@@ -1342,6 +1360,7 @@ img,.card{image-rendering:pixelated}
     <button class="pack" data-amt="100"><span>+100 <small>POCKET CHANGE</small></span><i data-lucide="coins"></i></button>
     <button class="pack" data-amt="500"><span>+500 <small>ARCADE STACK</small></span><i data-lucide="wallet"></i></button>
     <button class="pack" data-amt="1000"><span>+1000 <small>HIGH ROLLER</small></span><i data-lucide="landmark"></i></button>
+    <button class="pack pack-life" data-life="1"><span>BUY 1 LIFE <small>+1 LIFE</small></span><i data-lucide="heart"></i></button>
     <button class="btn btn-ghost btn-block" id="closeShop">CLOSE</button>
   </div>
 </div>
@@ -1482,6 +1501,9 @@ let muted = false;
 let actx = null;
 let fallbackTokens = 50;
 const KEY = 'speed_tokens_v1';
+const LIVES_KEY = 'speed_lives_v1';
+const MAX_LIVES = 5;
+let fallbackLives = 5;
 
 function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
 
@@ -1520,21 +1542,21 @@ const sfx = {
 let gameOverAudio = null;
 function playGameOverSound(){
   if(muted) return;
-  if(!gameOverAudio) gameOverAudio = new Audio('gameOver.wav');
+  if(!gameOverAudio) gameOverAudio = new Audio('music/gameOver.wav');
   gameOverAudio.currentTime = 0;
   gameOverAudio.play().catch(()=>{});
 }
 let youWinAudio = null;
 function playYouWinSound(){
   if(muted) return;
-  if(!youWinAudio) youWinAudio = new Audio('youWin.wav');
+  if(!youWinAudio) youWinAudio = new Audio('music/youWin.wav');
   youWinAudio.currentTime = 0;
   youWinAudio.play().catch(()=>{});
 }
 let dropAudio = null;
 function playDropSound(){
   if(muted) return;
-  if(!dropAudio) dropAudio = new Audio('drop.wav');
+  if(!dropAudio) dropAudio = new Audio('music/drop.wav');
   dropAudio.currentTime = 0;
   dropAudio.play().catch(()=>{});
 }
@@ -1557,7 +1579,7 @@ let menuMusicVolume = 0.1;
 let inTournament = false;
 function startMusic(){
   if(music) return;
-  music = new Audio('Arcade Groove.mp3');
+  music = new Audio('music/Arcade Groove.mp3');
   music.loop = false;
   music.volume = 0.1;
   music.addEventListener('ended', ()=>{ if(music && !muted && inTournament){ music.currentTime = 0; music.play().catch(()=>{}); } });
@@ -1568,7 +1590,7 @@ function stopMusic(){
 }
 function startMenuMusic(){
   if(menuMusic) return;
-  menuMusic = new Audio('Card Rush.mp3');
+  menuMusic = new Audio('music/Card Rush.mp3');
   menuMusic.loop = false;
   menuMusic.volume = menuMusicVolume;
   menuMusic.addEventListener('ended', ()=>{ if(menuMusic && !muted && !inTournament){ menuMusic.currentTime = 0; menuMusic.play().catch(()=>{}); } });
@@ -1623,6 +1645,28 @@ function updateWallet(flash){
   renderTiers();
 }
 
+function getLives(){
+  try{
+    const v = parseInt(localStorage.getItem(LIVES_KEY), 10);
+    return Number.isFinite(v) && v >= 0 ? v : 5;
+  }catch(e){ return fallbackLives; }
+}
+function setLives(v){
+  v = Math.max(0, Math.min(MAX_LIVES, v || 0));
+  fallbackLives = v;
+  try{ localStorage.setItem(LIVES_KEY, String(v)); }catch(e){}
+  updateLivesDisplay();
+}
+function updateLivesDisplay(){
+  const v = getLives();
+  $('livesLobby').textContent = v;
+  const pill = $('livesPill');
+  if(pill){
+    pill.classList.toggle('zero', v === 0);
+    pill.classList.toggle('full', v >= MAX_LIVES);
+  }
+  renderTiers();
+}
 const XP_KEY = 'speed_xp_v1';
 let progressXp = 0;
 function loadXp(){
@@ -1677,17 +1721,30 @@ function tokenSessionReset(){
     sessionStorage.setItem('sp_tokens_seen', '1');
   }catch(e){}
 }
+function livesSessionReset(){
+  try{
+    if(!sessionStorage.getItem('sp_lives_seen')){
+      fallbackLives = MAX_LIVES;
+      localStorage.setItem(LIVES_KEY, String(MAX_LIVES));
+    }
+    sessionStorage.setItem('sp_lives_seen', '1');
+  }catch(e){}
+}
 tokenSessionReset();
+livesSessionReset();
+fallbackLives = getLives();
 
 let currentTierIndex = 0;
 const tierTrack = $('tierTrack');
 const tierPrev = $('tierPrev');
 const tierNext = $('tierNext');
+updateLivesDisplay();
 
 function renderTiers(){
   const bal = getTokens();
+  const lv = getLives();
   tierTrack.innerHTML = TIERS.map((t, i)=>{
-    const can = bal >= t.fee;
+    const can = bal >= t.fee && lv > 0;
     return '<article class="tier-card" data-index="'+i+'" style="--accent:'+t.color+'">'
       + '<i data-lucide="'+t.icon+'" class="cup" style="color:'+t.color+'"></i>'
       + '<h3>'+t.name+'</h3>'
@@ -1697,7 +1754,7 @@ function renderTiers(){
       +   '<div class="trow"><span>CPU SPEED</span><b>'+t.ai[0]+'-'+t.ai[1]+'s</b></div>'
       + '</div>'
       + '<button class="btn btn-block" data-tier="'+t.id+'"'+(can?'':' disabled')+'>'
-      +   (can ? 'ENTER ARENA' : 'NEED '+t.fee)
+      +   (lv <= 0 ? 'NO LIVES' : can ? 'ENTER ARENA' : 'NEED '+t.fee)
       + '</button>'
       + '</article>';
   }).join('');
@@ -1720,7 +1777,7 @@ function updateCarousel(){
 }
 tierPrev.addEventListener('click', ()=>{
   if(currentTierIndex > 0){
-    const snd = new Audio('click.wav');
+    const snd = new Audio('music/click.wav');
     snd.volume = 0.35;
     snd.play().catch(()=>{});
     currentTierIndex--;
@@ -1729,7 +1786,7 @@ tierPrev.addEventListener('click', ()=>{
 });
 tierNext.addEventListener('click', ()=>{
   if(currentTierIndex < TIERS.length - 1){
-    const snd = new Audio('click.wav');
+    const snd = new Audio('music/click.wav');
     snd.volume = 0.35;
     snd.play().catch(()=>{});
     currentTierIndex++;
@@ -1751,14 +1808,28 @@ $('freeBtn').addEventListener('click', ()=>{
   setTokens(getTokens() + 25);
   sfx.play();
 });
-$('shopBtn').addEventListener('click', ()=>{ shopOverlay.classList.remove('hidden'); refreshIcons(); });
+$('shopBtn').addEventListener('click', ()=>{ shopOverlay.classList.remove('hidden'); refreshIcons(); const lifePack=$('shopOverlay').querySelector('.pack-life');if(lifePack){lifePack.disabled=getLives()>=MAX_LIVES;} });
 $('closeShop').addEventListener('click', ()=> shopOverlay.classList.add('hidden'));
 shopOverlay.addEventListener('click', e=>{
   if(e.target === shopOverlay) shopOverlay.classList.add('hidden');
   const pack = e.target.closest('.pack');
   if(pack){
-    setTokens(getTokens() + parseInt(pack.dataset.amt, 10));
-    sfx.win();
+    if(pack.dataset.life){
+      pack.disabled=getLives()>=MAX_LIVES;
+      if(pack.disabled) return;
+      setLives(getLives() + 1);
+      sfx.win();
+      const pill = $('livesPill');
+      if(pill){
+        pill.classList.remove('lives-bump');
+        void pill.offsetWidth;
+        pill.classList.add('lives-bump');
+      }
+      pack.disabled=getLives()>=MAX_LIVES;
+    }else{
+      setTokens(getTokens() + parseInt(pack.dataset.amt, 10));
+      sfx.win();
+    }
   }
 });
 
@@ -2102,6 +2173,7 @@ $('fsBtn').addEventListener('click', ()=>{
 });
 document.addEventListener('fullscreenchange', updateFsIcon);
 renderLevelBar();
+updateLivesDisplay();
 $('menuMusicVolume').value = Math.round(menuMusicVolume * 100);
 setMenuMusicVolume(menuMusicVolume);
 function tryStartMenuMusic(){
@@ -2184,6 +2256,7 @@ function updateScoreboard(){
 
 async function startMatch(tier){
   if(getTokens() < tier.fee) return;
+  if(getLives() <= 0){ sfx.bad(); return; }
   setTokens(getTokens() - tier.fee);
   match = { tier: tier, you: 0, ai: 0, round: 0, draws: 0, xp: 0, drawXp: 0, comboXp: 0, bonusXp: 0, xpStart: progressXp, totalXp: 0, roundXp: [], roundDrawXp: [], roundComboXp: [], roundBonusXp: [], combo: 0, comboActive: false, comboTimer: null };
   renderMatchXp();
@@ -2440,7 +2513,7 @@ function drawOne(){
     renderMatchXp();
     triggerDrawMilestone(draws);
   }
-  const snd = new Audio('drawCard.wav');
+  const snd = new Audio('music/drawCard.wav');
   snd.volume = 0.4;
   snd.play().catch(()=>{});
   sfx.flip();
@@ -2475,7 +2548,7 @@ function triggerDrawMilestone(draws){
 }
 
 function launchFireworks(canvas, count, ...colors){
-  const snd = new Audio('firework.wav');
+  const snd = new Audio('music/firework.wav');
   snd.volume = 0.3;
   snd.play().catch(()=>{});
   canvas.classList.remove('hidden');
@@ -2668,7 +2741,7 @@ function showComboAnnounce(n){
     word = 'WOW!'; cls = 'wow ' + (isLeft ? 'left' : 'right');
     voice = {text:'Wow', rate:1.1, pitch:1.3};
     if(!muted){
-      const snd = new Audio('WOW.mp3');
+      const snd = new Audio('music/WOW.mp3');
       snd.volume = 0.6;
       snd.play().catch(()=>{});
     }
@@ -2676,7 +2749,7 @@ function showComboAnnounce(n){
     word = 'COOL!'; cls = 'cool ' + (isLeft ? 'left' : 'right');
     voice = {text:'Cool', rate:0.9, pitch:1.1};
     if(!muted){
-      const snd = new Audio('cool.mp3');
+      const snd = new Audio('music/cool.mp3');
       snd.volume = 0.6;
       snd.play().catch(()=>{});
     }
@@ -2684,7 +2757,7 @@ function showComboAnnounce(n){
     word = 'SPEED!'; cls = 'speed center';
     voice = {text:'Speed', rate:0.5, pitch:1.4};
     if(!muted){
-      const snd = new Audio('speed.mp3');
+      const snd = new Audio('music/speed.mp3');
       snd.volume = 0.6;
       snd.play().catch(()=>{});
     }
@@ -2951,6 +3024,13 @@ function finishMatch(){
     $('resultTitle').textContent = 'DEFEAT!';
     $('resultSub').textContent = 'BETTER LUCK NEXT TIME';
     playGameOverSound();
+    setLives(getLives() - 1);
+    const pill = $('livesPill');
+    if(pill){
+      pill.classList.remove('lives-bump');
+      void pill.offsetWidth;
+      pill.classList.add('lives-bump');
+    }
   }
   renderXpResult();
   endCard.classList.remove('end-win','end-lose');
@@ -3065,7 +3145,7 @@ function appendSpeedLetter(letter){
   const container = $('speedLetters');
   if(container) container.appendChild(el)
   if(!muted){
-    const snd = new Audio(letter + '.mp3');
+    const snd = new Audio('music/' + letter + '.mp3');
     snd.volume = 0.6;
     snd.play().catch(()=>{});
   }
@@ -3090,7 +3170,7 @@ handEl.addEventListener('click', e=>{
     sfx.bad();
     return;
   }
-  const snd = new Audio('click.wav');
+  const snd = new Audio('music/click.wav');
   snd.volume = 0.35;
   snd.play().catch(()=>{});
   if(G.selected === idx){
@@ -3128,7 +3208,7 @@ $('tableZone').addEventListener('click', e=>{
 });
 
 flipBtn.addEventListener('click', () => {
-  const snd = new Audio('flip.wav');
+  const snd = new Audio('music/flip.wav');
   snd.volume = 0.5;
   snd.play().catch(()=>{});
   sfx.flipClick();
@@ -3147,6 +3227,7 @@ $('rematchBtn').addEventListener('click', ()=>{
   G = null;
   resultOverlay.classList.add('hidden');
   if(getTokens() < tier.fee){ backToLobby(); return; }
+  if(getLives() <= 0){ sfx.bad(); backToLobby(); return; }
   startMatch(tier);
 });
 $('endContinueBtn').addEventListener('click', ()=>{
