@@ -25,6 +25,14 @@ Script 1 loads before script 2 and they share `window`. Script 1 defines `G`, `s
 - `startMatch()` and the rematch handler both check `getLives() <= 0` and block entry (`sfx.bad()`). Tier buttons show "NO LIVES" and are disabled at 0 lives.
 - "Buy 1 Life" shop pack (`data-life="1"`, class `.pack-life`) increments +1, auto-disables at 5.
 
+## XP & Combo visual systems
+Visual-only additions — gameplay rules, XP progression (`floor(xp/100)+1`), and combo mechanics are unchanged.
+- Helper functions in script 2: `xpTier(a)` → `'small'|'normal'|'large'`; `comboTier(n)` → `'l2'|'l3'|'l5'`; `xpBurst(amount)`; `comboBurst(n)`; `spawnPixels(x,y,count,color,spread,cls)` (hard-edged square particles, auto-removed after 550ms); `flashXp()`; `flashCombo()`; `shakeHard()`; `levelUpCelebrate()`.
+- `popXpPanel(amount)` now accepts and displays an XP amount.
+- Level-up is detected by comparing `levelOf(progressXp)` before and after every `setXp()` call; call `levelUpCelebrate()` on increase. Call sites: `playFromHand` (+1), `drawOne` (+5), `doFlip` (+5), `registerCombo` (+5), `finishMatch` (+10).
+- XP pop classes: `xp-small`, `xp-normal`, `xp-large`, `xp-levelup`. Combo pop classes: `combo-l2` (x2), `combo-l3` (x3–4), `combo-l5` (x5+). Combo announce word gets `combo-big` at x5+.
+- Keep animations short and responsive; never block card gameplay.
+
 ## Verification
 Parse-check both inline `<script>` blocks (silent output = OK):
 `node -e "const h=require('fs').readFileSync('index.html','utf8');[...h.matchAll(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g)].forEach((m,i)=>{try{new Function(m[1])}catch(e){console.log('script',i+1,e.message)}})"`
