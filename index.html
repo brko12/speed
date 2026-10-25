@@ -22,6 +22,7 @@
   --muted:#64748b;
   --line:#1e293b;
   --speed:#38bdf8;
+--gem:#c084fc;
 }
 *{box-sizing:border-box}
 *{cursor:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABDElEQVR4nOWXgQ6EIAiG/Vnv/8rc2rI4BoqFdtv9W1smwheiGUpfLO5RkkUDwa32Y6EHwHzFBJCeCRoxljCvAAjx2wDlfwBwFZ5XB/xkSra7A50lCqcPdzOAJgHzeYnAbGSKp9cAi4D13oH7mjKKONd1kCTWAJqQszcklZEiAa48BecuGsDxewoykDaSqc/chuU3hVoBZuz9WmRQrSzEUgHgBZmdhS1i5BbQAVz7e21LJP3JQatEqr0cgoxnq6KjuRXPyoL2S57dDAjrUEst+/KLJ6Ke9JLTS1K/GLoene/EiFr/ExQZr5ykioJ2YYjdZgSWwpYBCNkXhcAAwK5IIXgnYzNe9o+JDBB6uQ+33HcxYlXy/QAAAABJRU5ErkJggg==") 9 0, pointer!important}
@@ -71,8 +72,9 @@ img,.card{image-rendering:pixelated}
   z-index:1000; padding:16px;
 }
 
-#lobby{min-height:100dvh;display:flex;flex-direction:column;padding:22px clamp(14px,4vw,44px) 40px}
+#lobby{min-height:100dvh;display:flex;flex-direction:column;padding:8px clamp(14px,4vw,44px) 40px}
 .lobby-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.lobby-left{display:flex;flex-direction:column;gap:16px}
 .logo{
   font-family:'Press Start 2P',monospace;
   font-size:clamp(34px,7vw,62px);
@@ -111,16 +113,43 @@ img,.card{image-rendering:pixelated}
 }
 .wallet-amount .lucide{width:17px;height:17px;stroke-width:3}
 .wallet-amount.bump{animation:bump .4s}
+.wallet-amount.gem{color:var(--gem);border-color:#5b21b6}
+.wallet-amount.gem .lucide{color:var(--gem)}
 @keyframes bump{35%{transform:scale(1.16);color:#34d399}}
-.lives-amount{color:#fff;background:var(--crimson);border:3px solid #7f1d1d;box-shadow:0 4px 0 var(--ink)}
-.lives-amount .lucide{width:17px;height:17px;stroke-width:3;color:#fff}
-.lives-amount.zero{color:#fff;background:#7f1d1d;border-color:#450a0a}
-.lives-amount.zero .lucide{color:#fff}
-.lives-amount.full{color:#fff;background:#b91c1c;border-color:#7f1d1d}
-.lives-amount.full .lucide{color:#fff}
-.lives-bump{animation:livesBump .4s}
-@keyframes livesBump{35%{transform:scale(1.16);color:#fff;box-shadow:0 4px 0 var(--ink), 0 0 25px rgba(239,68,68,.8)}}
-.lobby-main{flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px;padding-top:34px;max-width:1120px;width:100%;margin:0 auto}
+.lobby-main{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:-160px;max-width:1400px;align-self:center}
+.lobby-center{display:flex;flex-direction:column;align-items:center;gap:26px}
+.lobby-center h2.section-title{text-align:center}
+.daily-panel{
+  background:var(--panel);
+  border:3px solid var(--ink);
+  box-shadow:0 7px 0 var(--ink);
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.daily-panel h3{
+  font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold);margin:0 0 4px;text-align:center;letter-spacing:.2em;text-transform:uppercase;
+}
+.daily-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--navy);
+  border:2px solid var(--ink);
+  padding:10px 12px;
+  transition:border-color .15s;
+}
+.daily-item.done{border-color:var(--green);background:#0b2a1a}
+.daily-item .status{
+  font-family:'Press Start 2P',monospace;font-size:9px;
+}
+.daily-item .progress{color:#94a3b8}
+.daily-item .progress.done{color:var(--green)}
+.daily-item .reward{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold)}
+.daily-item .reward.done{color:var(--green)}
+.daily-item .icon{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--panel);border:2px solid var(--ink);font-size:14px}
+.daily-item.done .icon{border-color:var(--green)}
+.daily-item .label{flex:1;min-width:0}
+.daily-item .label .title{font-family:'Press Start 2P',monospace;font-size:10px;color:#e2e8f0;display:block}
+.daily-item .label .desc{font-size:8px;color:#64748b;margin-top:1px}
+.lobby-center h2.section-title{text-align:center}
 .section-title{
   font-family:'Press Start 2P',monospace;font-size:clamp(12px,2vw,16px);
   color:#94a3b8;margin:0;text-align:center;letter-spacing:.3em;
@@ -334,13 +363,13 @@ img,.card{image-rendering:pixelated}
 .pack.selected{border-color:var(--gold);background:#16213c;box-shadow:0 0 0 2px var(--gold)}
 .pack .lucide{width:20px;height:20px;color:var(--gold);stroke-width:2.5;flex-shrink:0}
 .pack small{display:block;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green);margin-top:6px}
-.pack-life{background:#0b1324;border-color:var(--green);color:var(--green)}
-.pack-life:hover:not(:disabled){border-color:#34d399;background:#16213c;transform:translateY(-2px)}
-.pack-life:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
-.pack-life .lucide{color:var(--green);stroke-width:2.5}
-.pack-life small{color:var(--green)}
-.pack-life:disabled{background:#334155;border-color:#334155;color:#64748b;cursor:not-allowed}
-.pack-life:disabled .lucide{color:#64748b}
+.pack-premium{border-color:var(--gem);color:var(--gem);background:#1a102e}
+.pack-premium:hover:not(:disabled){border-color:#c084fc;background:#2a184e;transform:translateY(-2px)}
+.pack-premium:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
+.pack-premium .lucide{color:var(--gem);stroke-width:2.5}
+.pack-premium small{color:var(--gem)}
+.pack-premium:disabled{background:#334155;border-color:#334155;color:#64748b;cursor:not-allowed}
+.pack-premium:disabled .lucide{color:#64748b}
 .cb-preview{
   width:40px;height:56px;flex-shrink:0;border:2px solid #0f172a;border-radius:3px;
   display:flex;align-items:center;justify-content:center;
@@ -1187,28 +1216,53 @@ img,.card{image-rendering:pixelated}
 <body>
 <section id="lobby">
   <header class="lobby-head">
-    <div class="level-panel">
-      <div class="lv-badge"><span>LV</span><b id="lvlNum">1</b></div>
-      <div class="lv-body">
-        <div class="lv-name">
-          <button class="avatar-btn" id="avatarBtn" title="Change Avatar" aria-label="Change Avatar">
-            <img id="lvlAvatar" src="" alt="" />
-          </button>
-          <span id="lvlName">PLAYER</span>
-          <button class="name-edit" id="nameEditBtn" title="Edit name"><i data-lucide="pencil"></i></button>
-          <button class="name-edit" id="randomNameBtn" title="Random Name"><i data-lucide="shuffle"></i></button>
+    <div class="lobby-left">
+      <div class="level-panel">
+        <div class="lv-badge"><span>LV</span><b id="lvlNum">1</b></div>
+        <div class="lv-body">
+          <div class="lv-name">
+            <button class="avatar-btn" id="avatarBtn" title="Change Avatar" aria-label="Change Avatar">
+              <img id="lvlAvatar" src="" alt="" />
+            </button>
+            <span id="lvlName">PLAYER</span>
+            <button class="name-edit" id="nameEditBtn" title="Edit name"><i data-lucide="pencil"></i></button>
+            <button class="name-edit" id="randomNameBtn" title="Random Name"><i data-lucide="shuffle"></i></button>
+          </div>
+          <div class="lv-line"><span class="lv-text" id="lvlText">0 / 100 XP</span><span class="lv-text" id="lvlTotal">0 TOTAL</span></div>
+          <div class="lv-bar"><i id="lvlFill"></i></div>
+          <span class="lv-next" id="lvlNext">100 XP TO LEVEL 2</span>
         </div>
-        <div class="lv-line"><span class="lv-text" id="lvlText">0 / 100 XP</span><span class="lv-text" id="lvlTotal">0 TOTAL</span></div>
-        <div class="lv-bar"><i id="lvlFill"></i></div>
-        <span class="lv-next" id="lvlNext">100 XP TO LEVEL 2</span>
       </div>
+      <aside class="daily-challenges">
+        <div class="daily-panel">
+          <h3>Daily Challenges</h3>
+          <div class="daily-item" id="dailyWin">
+            <div class="icon"><i data-lucide="trophy"></i></div>
+            <div class="label"><span class="title">Win 3 Games</span><span class="desc">Tournament victories</span></div>
+            <div class="status progress" id="dailyWinProg">0/3</div>
+            <div class="reward" id="dailyWinRew">100 COINS</div>
+          </div>
+          <div class="daily-item" id="dailyWow">
+            <div class="icon"><i data-lucide="zap"></i></div>
+            <div class="label"><span class="title">Make 5 WOWs</span><span class="desc">During tournament matches</span></div>
+            <div class="status progress" id="dailyWowProg">0/5</div>
+            <div class="reward" id="dailyWowRew">100 COINS</div>
+          </div>
+          <div class="daily-item" id="dailySpeed">
+            <div class="icon"><i data-lucide="zap"></i></div>
+            <div class="label"><span class="title">Make 2 SPEEDs</span><span class="desc">During games</span></div>
+            <div class="status progress" id="dailySpeedProg">0/2</div>
+            <div class="reward" id="dailySpeedRew">100 COINS</div>
+          </div>
+        </div>
+      </aside>
     </div>
     <div class="wallet">
       <div class="wallet-amount" id="walletPill">
         <i data-lucide="coins"></i><span id="tokensLobby">50</span>
       </div>
-      <div class="wallet-amount lives-amount" id="livesPill">
-        <i data-lucide="heart"></i><span id="livesLobby">5</span>
+      <div class="wallet-amount gem" id="premiumPill">
+        <i data-lucide="gem"></i><span id="premiumLobby">0</span>
       </div>
       <button class="btn btn-green" id="freeBtn"><i data-lucide="gift"></i> FREE +25</button>
       <button class="btn btn-gold" id="shopBtn"><i data-lucide="shopping-bag"></i> SHOP</button>
@@ -1224,15 +1278,17 @@ img,.card{image-rendering:pixelated}
   </header>
 
   <main class="lobby-main">
-    <h2 class="section-title">Select Arena</h2>
-    <div class="tier-carousel" id="tierCarousel">
-      <div class="tier-track" id="tierTrack"></div>
-      <div class="carousel-arrows">
-        <button class="carousel-arrow prev" id="tierPrev" title="Previous Arena"><i data-lucide="chevron-left"></i></button>
-        <button class="carousel-arrow next" id="tierNext" title="Next Arena"><i data-lucide="chevron-right"></i></button>
+    <div class="lobby-center">
+      <h2 class="section-title">Select Arena</h2>
+      <div class="tier-carousel" id="tierCarousel">
+        <div class="tier-track" id="tierTrack"></div>
+        <div class="carousel-arrows">
+          <button class="carousel-arrow prev" id="tierPrev" title="Previous Arena"><i data-lucide="chevron-left"></i></button>
+          <button class="carousel-arrow next" id="tierNext" title="Next Arena"><i data-lucide="chevron-right"></i></button>
+        </div>
       </div>
+      <p class="footnote">PROTOTYPE — VIRTUAL TOKENS ONLY</p>
     </div>
-    <p class="footnote">PROTOTYPE — VIRTUAL TOKENS ONLY</p>
   </main>
 </section>
 
@@ -1282,6 +1338,7 @@ img,.card{image-rendering:pixelated}
     <button class="btn btn-ghost" id="quitBtn"><i data-lucide="log-out"></i> QUIT</button>
     <span class="badge" id="tierBadge">ARENA</span>
     <span class="wallet-mini" id="walletMini"><i data-lucide="coins"></i><span id="tokensGame">50</span></span>
+    <span class="wallet-mini" id="premiumMini"><i data-lucide="gem"></i><span id="premiumGame">0</span></span>
     <button class="btn btn-ghost btn-icon" id="fsBtn" title="Fullscreen"><i data-lucide="maximize"></i></button>
     <button class="btn btn-ghost btn-icon" id="muteBtn2" title="Sound"><i data-lucide="volume-2"></i></button>
   </div>
@@ -1404,12 +1461,12 @@ img,.card{image-rendering:pixelated}
 
 <div class="overlay hidden" id="shopOverlay">
   <div class="modal-card">
-    <h3>TOKEN SHOP</h3>
-    <p class="modal-sub">Balance: <span id="tokensShop" style="color:var(--gold)">50</span> tokens</p>
-    <button class="pack" data-amt="100"><span>+100 <small>POCKET CHANGE</small></span><i data-lucide="coins"></i></button>
-    <button class="pack" data-amt="500"><span>+500 <small>ARCADE STACK</small></span><i data-lucide="wallet"></i></button>
-    <button class="pack" data-amt="1000"><span>+1000 <small>HIGH ROLLER</small></span><i data-lucide="landmark"></i></button>
-    <button class="pack pack-life" data-life="1"><span>BUY 1 LIFE <small>+1 LIFE</small></span><i data-lucide="heart"></i></button>
+    <h3>SHOP</h3>
+    <p class="modal-sub">Balance: <span id="tokensShop" style="color:var(--gold)">50</span> tokens  <span style="color:var(--gem)">|</span>  <span id="premiumShop" style="color:var(--gem)">0</span> <i data-lucide="gem" style="width:14px;height:14px;vertical-align:-1px"></i></p>
+    <button class="pack pack-premium" data-amt="100" data-premium-cost="5"><span>+100 <small>POCKET CHANGE · 5 GEMS</small></span><i data-lucide="coins"></i></button>
+    <button class="pack pack-premium" data-amt="500" data-premium-cost="20"><span>+500 <small>ARCADE STACK · 20 GEMS</small></span><i data-lucide="wallet"></i></button>
+    <button class="pack pack-premium" data-amt="1000" data-premium-cost="40"><span>+1000 <small>HIGH ROLLER · 40 GEMS</small></span><i data-lucide="landmark"></i></button>
+    <button class="pack pack-premium" data-premium="25"><span>ADD PREMIUM COINS <small>+25 GEMS</small></span><i data-lucide="gem"></i></button>
     <button class="btn btn-ghost btn-block" id="closeShop">CLOSE</button>
   </div>
 </div>
@@ -1550,9 +1607,8 @@ let muted = false;
 let actx = null;
 let fallbackTokens = 50;
 const KEY = 'speed_tokens_v1';
-const LIVES_KEY = 'speed_lives_v1';
-const MAX_LIVES = 5;
-let fallbackLives = 5;
+const PREMIUM_KEY = 'speed_premium_v1';
+let fallbackPremium = 0;
 
 function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
 
@@ -1677,11 +1733,27 @@ function setTokens(v){
   try{ localStorage.setItem(KEY, String(v)); }catch(e){}
   updateWallet(true);
 }
+function getPremium(){
+  try{
+    const v = parseInt(localStorage.getItem(PREMIUM_KEY), 10);
+    return Number.isFinite(v) && v >= 0 ? v : 0;
+  }catch(e){ return fallbackPremium; }
+}
+function setPremium(v){
+  v = Math.max(0, v);
+  fallbackPremium = v;
+  try{ localStorage.setItem(PREMIUM_KEY, String(v)); }catch(e){}
+  updateWallet(false);
+}
 function updateWallet(flash){
-  const v = getTokens();
-  $('tokensLobby').textContent = v;
-  $('tokensGame').textContent = v;
-  $('tokensShop').textContent = v;
+  const tv = getTokens();
+  const pv = getPremium();
+  $('tokensLobby').textContent = tv;
+  $('tokensGame').textContent = tv;
+  $('tokensShop').textContent = tv;
+  $('premiumLobby').textContent = pv;
+  $('premiumGame').textContent = pv;
+  $('premiumShop').textContent = pv;
   if(flash){
     const pill = $('walletPill');
     const mini = $('walletMini');
@@ -1690,29 +1762,6 @@ function updateWallet(flash){
       void el.offsetWidth;
       el.classList.add('bump');
     });
-  }
-  renderTiers();
-}
-
-function getLives(){
-  try{
-    const v = parseInt(localStorage.getItem(LIVES_KEY), 10);
-    return Number.isFinite(v) && v >= 0 ? v : 5;
-  }catch(e){ return fallbackLives; }
-}
-function setLives(v){
-  v = Math.max(0, Math.min(MAX_LIVES, v || 0));
-  fallbackLives = v;
-  try{ localStorage.setItem(LIVES_KEY, String(v)); }catch(e){}
-  updateLivesDisplay();
-}
-function updateLivesDisplay(){
-  const v = getLives();
-  $('livesLobby').textContent = v;
-  const pill = $('livesPill');
-  if(pill){
-    pill.classList.toggle('zero', v === 0);
-    pill.classList.toggle('full', v >= MAX_LIVES);
   }
   renderTiers();
 }
@@ -1771,30 +1820,94 @@ function tokenSessionReset(){
     sessionStorage.setItem('sp_tokens_seen', '1');
   }catch(e){}
 }
-function livesSessionReset(){
+tokenSessionReset();
+const PREMIUM_RESET = 0;
+function premiumSessionReset(){
   try{
-    if(!sessionStorage.getItem('sp_lives_seen')){
-      fallbackLives = MAX_LIVES;
-      localStorage.setItem(LIVES_KEY, String(MAX_LIVES));
+    if(!sessionStorage.getItem('sp_premium_seen')){
+      fallbackPremium = PREMIUM_RESET;
+      localStorage.setItem(PREMIUM_KEY, String(PREMIUM_RESET));
     }
-    sessionStorage.setItem('sp_lives_seen', '1');
+    sessionStorage.setItem('sp_premium_seen', '1');
   }catch(e){}
 }
-tokenSessionReset();
-livesSessionReset();
-fallbackLives = getLives();
+premiumSessionReset();
+
+const DAILY_KEY = 'speed_daily_v1';
+const DAILY_RESET = {wins:0,wows:0,speeds:0,claimed:[false,false,false]};
+let daily = null;
+function getDaily(){
+  if(daily) return daily;
+  try{
+    const raw = localStorage.getItem(DAILY_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    daily = parsed && typeof parsed.wins === 'number' ? parsed : {wins:0,wows:0,speeds:0,claimed:[false,false,false]};
+  }catch(e){ daily = {wins:0,wows:0,speeds:0,claimed:[false,false,false]}; }
+  return daily;
+}
+function setDaily(){
+  try{ localStorage.setItem(DAILY_KEY, JSON.stringify(daily)); }catch(e){}
+  updateDailyUI();
+}
+function dailyInc(kind){
+  const d = getDaily();
+  let progressed = false;
+  if(kind === 'win' && d.wins < 3){ d.wins++; progressed = true; }
+  else if(kind === 'wow' && d.wows < 5){ d.wows++; progressed = true; }
+  else if(kind === 'speed' && d.speeds < 2){ d.speeds++; progressed = true; }
+  if(!progressed) return;
+  checkDaily(kind);
+  setDaily();
+}
+function checkDaily(kind){
+  const d = getDaily();
+  if(kind === 'win' && d.wins >= 3 && !d.claimed[0]){ d.claimed[0] = true; setTokens(getTokens() + 100); }
+  else if(kind === 'wow' && d.wows >= 5 && !d.claimed[1]){ d.claimed[1] = true; setTokens(getTokens() + 100); }
+  else if(kind === 'speed' && d.speeds >= 2 && !d.claimed[2]){ d.claimed[2] = true; setTokens(getTokens() + 100); }
+}
+function dailySessionReset(){
+  try{
+    if(!sessionStorage.getItem('sp_daily_seen')){
+      daily = {wins:0,wows:0,speeds:0,claimed:[false,false,false]};
+      localStorage.setItem(DAILY_KEY, JSON.stringify(daily));
+    }
+    sessionStorage.setItem('sp_daily_seen', '1');
+  }catch(e){}
+}
+function updateDailyUI(){
+  const d = getDaily();
+  const items = [
+    {id:'dailyWin', cur:d.wins, tgt:3, claimed:d.claimed[0], progId:'dailyWinProg', rewId:'dailyWinRew'},
+    {id:'dailyWow', cur:d.wows, tgt:5, claimed:d.claimed[1], progId:'dailyWowProg', rewId:'dailyWowRew'},
+    {id:'dailySpeed', cur:d.speeds, tgt:2, claimed:d.claimed[2], progId:'dailySpeedProg', rewId:'dailySpeedRew'}
+  ];
+  items.forEach(it=>{
+    const el = $(it.id);
+    const prog = $(it.progId);
+    const rew = $(it.rewId);
+    if(!el) return;
+    const done = it.claimed || it.cur >= it.tgt;
+    el.classList.toggle('done', done);
+    if(prog) prog.textContent = Math.min(it.cur, it.tgt) + '/' + it.tgt;
+    if(prog) prog.classList.toggle('done', done);
+    if(rew){
+      rew.textContent = done ? 'CLAIMED' : '100 COINS';
+      rew.classList.toggle('done', done);
+    }
+  });
+}
+dailySessionReset();
 
 let currentTierIndex = 0;
 const tierTrack = $('tierTrack');
 const tierPrev = $('tierPrev');
 const tierNext = $('tierNext');
-updateLivesDisplay();
+renderTiers();
 
 function renderTiers(){
   const bal = getTokens();
-  const lv = getLives();
   tierTrack.innerHTML = TIERS.map((t, i)=>{
-    const can = bal >= t.fee && lv > 0;
+    const can = bal >= t.fee;
     return '<article class="tier-card" data-index="'+i+'" style="--accent:'+t.color+'">'
       + '<i data-lucide="'+t.icon+'" class="cup" style="color:'+t.color+'"></i>'
       + '<h3>'+t.name+'</h3>'
@@ -1804,7 +1917,7 @@ function renderTiers(){
       +   '<div class="trow"><span>CPU SPEED</span><b>'+t.ai[0]+'-'+t.ai[1]+'s</b></div>'
       + '</div>'
       + '<button class="btn btn-block" data-tier="'+t.id+'"'+(can?'':' disabled')+'>'
-      +   (lv <= 0 ? 'NO LIVES' : can ? 'ENTER ARENA' : 'NEED '+t.fee)
+      +   (can ? 'ENTER ARENA' : 'NEED '+t.fee)
       + '</button>'
       + '</article>';
   }).join('');
@@ -1858,27 +1971,26 @@ $('freeBtn').addEventListener('click', ()=>{
   setTokens(getTokens() + 25);
   sfx.play();
 });
-$('shopBtn').addEventListener('click', ()=>{ shopOverlay.classList.remove('hidden'); refreshIcons(); const lifePack=$('shopOverlay').querySelector('.pack-life');if(lifePack){lifePack.disabled=getLives()>=MAX_LIVES;} });
+$('shopBtn').addEventListener('click', ()=>{ shopOverlay.classList.remove('hidden'); refreshIcons(); });
 $('closeShop').addEventListener('click', ()=> shopOverlay.classList.add('hidden'));
 shopOverlay.addEventListener('click', e=>{
   if(e.target === shopOverlay) shopOverlay.classList.add('hidden');
   const pack = e.target.closest('.pack');
   if(pack){
-    if(pack.dataset.life){
-      pack.disabled=getLives()>=MAX_LIVES;
-      if(pack.disabled) return;
-      setLives(getLives() + 1);
+    if(pack.dataset.premiumCost){
+      const cost = parseInt(pack.dataset.premiumCost, 10);
+      const amt = parseInt(pack.dataset.amt, 10);
+      if(getPremium() < cost){ sfx.bad(); return; }
+      setPremium(getPremium() - cost);
+      setTokens(getTokens() + amt);
       sfx.win();
-      const pill = $('livesPill');
-      if(pill){
-        pill.classList.remove('lives-bump');
-        void pill.offsetWidth;
-        pill.classList.add('lives-bump');
-      }
-      pack.disabled=getLives()>=MAX_LIVES;
-    }else{
-      setTokens(getTokens() + parseInt(pack.dataset.amt, 10));
+      return;
+    }
+    if(pack.dataset.premium){
+      const amt = parseInt(pack.dataset.premium, 10);
+      setPremium(getPremium() + amt);
       sfx.win();
+      return;
     }
   }
 });
@@ -2223,7 +2335,6 @@ $('fsBtn').addEventListener('click', ()=>{
 });
 document.addEventListener('fullscreenchange', updateFsIcon);
 renderLevelBar();
-updateLivesDisplay();
 $('menuMusicVolume').value = Math.round(menuMusicVolume * 100);
 setMenuMusicVolume(menuMusicVolume);
 function tryStartMenuMusic(){
@@ -2306,7 +2417,6 @@ function updateScoreboard(){
 
 async function startMatch(tier){
   if(getTokens() < tier.fee) return;
-  if(getLives() <= 0){ sfx.bad(); return; }
   setTokens(getTokens() - tier.fee);
   match = { tier: tier, you: 0, ai: 0, round: 0, draws: 0, xp: 0, drawXp: 0, comboXp: 0, bonusXp: 0, xpStart: progressXp, totalXp: 0, roundXp: [], roundDrawXp: [], roundComboXp: [], roundBonusXp: [], combo: 0, comboActive: false, comboTimer: null };
   renderMatchXp();
@@ -2476,6 +2586,7 @@ function backToLobby(){
   countdownEl.classList.add('hidden');
   lobby.classList.remove('hidden');
   updateWallet(false);
+  updateDailyUI();
   startMenuMusic();
 }
 
@@ -2802,6 +2913,7 @@ function showComboAnnounce(n){
       snd.volume = 0.6;
       snd.play().catch(()=>{});
     }
+    dailyInc('wow');
   }else if(n === 2){
     word = 'COOL!'; cls = 'cool ' + (isLeft ? 'left' : 'right');
     voice = {text:'Cool', rate:0.9, pitch:1.1};
@@ -2818,6 +2930,7 @@ function showComboAnnounce(n){
       snd.volume = 0.6;
       snd.play().catch(()=>{});
     }
+    dailyInc('speed');
   }
   const span = document.createElement('span');
   span.className = 'word ' + cls + (n >= 5 ? ' combo-big' : '');
@@ -2860,7 +2973,7 @@ function playFromHand(idx, pileIdx){
   renderMatchXp();
   showPlayXpPop(1);
   const gameEl = $('game');
-  gameEl.classList.remove('screen-shake');
+  gameEl.classList.remove('screen-shake','shake-hard');
   void gameEl.offsetWidth;
   gameEl.classList.add('screen-shake');
   if(G.speedActive && G.speedPlayed < 5){
@@ -3080,6 +3193,7 @@ function finishMatch(){
   stopMusic();
   if(won){
     setTokens(getTokens() + tier.prize);
+    dailyInc('win');
     resultCard.classList.add('victory');
     $('resultTitle').textContent = 'VICTORY!';
     $('resultSub').textContent = '+0 TOKENS';
@@ -3096,13 +3210,6 @@ function finishMatch(){
     $('resultTitle').textContent = 'DEFEAT!';
     $('resultSub').textContent = 'BETTER LUCK NEXT TIME';
     playGameOverSound();
-    setLives(getLives() - 1);
-    const pill = $('livesPill');
-    if(pill){
-      pill.classList.remove('lives-bump');
-      void pill.offsetWidth;
-      pill.classList.add('lives-bump');
-    }
   }
   renderXpResult();
   endCard.classList.remove('end-win','end-lose');
@@ -3299,7 +3406,6 @@ $('rematchBtn').addEventListener('click', ()=>{
   G = null;
   resultOverlay.classList.add('hidden');
   if(getTokens() < tier.fee){ backToLobby(); return; }
-  if(getLives() <= 0){ sfx.bad(); backToLobby(); return; }
   startMatch(tier);
 });
 $('endContinueBtn').addEventListener('click', ()=>{
