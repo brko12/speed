@@ -1210,6 +1210,207 @@ img,.card{image-rendering:pixelated}
 .lvlup-text{font-family:'Press Start 2P',monospace;font-size:clamp(40px,8vw,90px);color:#fff;text-shadow:-5px -5px 0 var(--ink),5px -5px 0 var(--ink),-5px 5px 0 var(--ink),5px 5px 0 var(--ink),0 0 60px rgba(253,224,71,1);animation:lvlupText 1.6s ease forwards;pointer-events:none}
 @keyframes lvlupText{0%{transform:scale(.2)rotate(-10deg);opacity:0}20%{transform:scale(1.2)rotate(4deg);opacity:1}40%{transform:scale(.9)rotate(-2deg);opacity:1}100%{transform:scale(1)rotate(0);opacity:0}}
 
+@media (max-width: 640px){
+  .lobby{min-height:100dvh;padding:6px clamp(8px,4vw,16px) 20px}
+  .lobby-head{flex-direction:column;align-items:stretch;gap:12px}
+  .lobby-left{flex-direction:column;align-items:stretch;gap:10px}
+  .logo{font-size:clamp(24px,8vw,40px);margin:0}
+  .tagline{font-size:16px;margin:8px 0 0}
+  .wallet{flex-wrap:wrap;justify-content:center;gap:8px}
+  .wallet-amount{padding:8px 11px;font-size:12px}
+  .wallet-amount .lucide{width:14px;height:14px}
+  .btn{font-size:9px;padding:9px 11px}
+  .btn-icon{padding:8px}
+  .menu-music-control{padding:5px 8px}
+  .menu-music-control input[type=range]{width:60px}
+  .lobby-main{margin-top:0;padding-top:8px}
+  .section-title{font-size:10px}
+  .tiers{gap:14px}
+  .tier{padding:16px 14px 14px;gap:10px}
+  .tier h3{font-size:11px}
+  .trow b{font-size:20px}
+  .trow span{font-size:7px}
+  .tier-carousel{max-width:320px}
+  .tier-track{height:240px}
+  .tier-card{width:260px;padding:16px 14px 14px}
+  .tier-card.pos-center{transform:translate(-50%,-50%) translateZ(40px) scale(1)}
+  .tier-card.pos-right{transform:translate(-50%,-50%) translateX(140px) translateZ(-60px) rotateY(-30deg) scale(.7)}
+  .tier-card.pos-left{transform:translate(-50%,-50%) translateX(-140px) translateZ(-60px) rotateY(30deg) scale(.7)}
+  .tier-card.pos-hidden{transform:translate(-50%,-50%) translateX(220px) translateZ(-150px) rotateY(-45deg) scale(.45)}
+  .tier-card.pos-hidden-left{transform:translate(-50%,-50%) translateX(-220px) translateZ(-150px) rotateY(45deg) scale(.45)}
+  .carousel-arrows{gap:12px;margin-top:20px}
+  .carousel-arrow{width:40px;height:40px;font-size:16px}
+  .carousel-arrow .lucide{width:18px;height:18px}
+  .rules-panel{padding:14px 16px}
+  .rules-panel h4{font-size:9px}
+  .rules-panel ul{font-size:15px;gap:5px}
+  .rules-panel .rules-intro{font-size:15px;margin-bottom:10px}
+  .rules-panel .rules-note{font-size:15px;padding:8px 10px;margin-top:10px}
+  .rules-panel .key{font-size:9px;padding:4px 7px;margin-right:6px}
+  .footnote{font-size:14px;margin-top:6px}
+  .level-panel{padding:8px 12px;gap:10px}
+  .lv-badge{padding:8px 8px;font-size:8px}
+  .lv-badge b{font-size:16px}
+  .lv-badge span{font-size:7px}
+  .lv-body{gap:4px}
+  .lv-name{flex-direction:column;align-items:flex-start;gap:6px}
+  .avatar-btn{width:30px;height:30px}
+  .lv-name>span{font-size:10px}
+  .name-edit{padding:4px 5px;font-size:9px}
+  .name-edit .lucide{width:11px;height:11px}
+  .lv-line{font-size:7px;gap:6px}
+  .lv-text{font-size:7px}
+  .lv-bar{height:12px}
+  .lv-next{font-size:6px}
+  .daily-panel{padding:12px;gap:10px}
+  .daily-panel h3{font-size:10px}
+  .daily-item{padding:8px 10px}
+  .daily-item .icon{width:24px;height:24px;font-size:12px}
+  .daily-item .label .title{font-size:9px}
+  .daily-item .label .desc{font-size:7px}
+  .daily-item .status{font-size:8px}
+  .daily-item .reward{font-size:9px}
+  #game{padding:6px 4px;gap:4px}
+  .game-top{padding-bottom:4px;gap:6px}
+  .badge{font-size:8px;padding:7px 9px}
+  .wallet-mini,.xp-mini{font-size:10px;padding:6px 8px}
+  .wallet-mini .lucide,.xp-mini .lucide{width:12px;height:12px}
+  .zone-label{font-size:8px;gap:6px}
+  .stat-chip{font-size:7px;padding:4px 6px}
+  .table-zone{gap:6px;min-height:0}
+  .stuck{font-size:clamp(10px,2vw,13px);padding:8px 12px}
+  .active-row{gap:clamp(8px,3vw,20px)}
+  .pile{--cw:clamp(42px,11vw,70px)}
+  .pile-label{font-size:7px}
+  .depth{font-size:7px;padding:3px 4px}
+  .backup-row{gap:clamp(8px,2vw,16px)}
+  .backup-slot .pile{--cw:clamp(34px,8vw,56px)}
+  .backup-slot span{font-size:6px}
+  .backup-slot span b{font-size:7px}
+  #flipBtn{font-size:9px;padding:8px 10px}
+  .stats-bar{padding:7px 10px;gap:8px;font-size:7px}
+  .stats-bar b{font-size:14px}
+  .player-row{gap:8px}
+  .draw-stack .card{--cw:clamp(36px,9vw,56px)}
+  .count-badge{font-size:7px;padding:3px 4px}
+  .draw-stack label{font-size:6px}
+  .hand{gap:clamp(4px,1vw,10px)}
+  .hand .card{--cw:clamp(38px,10vw,74px)}
+  #xpPop{font-size:clamp(9px,1.6vw,12px);padding:5px 10px}
+  #countdownWrap{width:min(220px,90vw);margin:0 auto 6px}
+  .countdown-bar{height:9px}
+  .countdown-num{font-size:clamp(22px,4vw,32px)}
+  .combo-wrap{height:22px}
+  .combo-bar{height:14px;width:min(240px,60vw)}
+  .combo-pop{font-size:clamp(9px,1.4vw,12px);padding:5px 10px}
+  .round-score{top:clamp(50px,7vw,80px);left:6px;transform:none;padding:6px 9px}
+  .round-score .rs-title{font-size:5px}
+  .round-score .rs-num{font-size:clamp(12px,2vw,16px)}
+  .round-score .rs-round{font-size:5px}
+  #speedLetters{left:8px;top:clamp(50px,7vw,80px);transform:none;gap:8px}
+  .speed-letter{font-size:clamp(24px,8vw,44px)}
+  .xp-match-panel{right:8px;top:clamp(50px,7vw,80px);transform:none}
+  .xp-match-panel .xp-mini{font-size:clamp(10px,1.5vw,12px);padding:8px 10px}
+  .xp-match-panel .xp-mini .lucide{width:14px;height:14px}
+  .combo-announce{display:none}
+  #drawAnnounce{padding-top:clamp(40px,8vw,70px)}
+  .draw-text{font-size:clamp(22px,6vw,40px)}
+  .result-card{padding:24px 16px}
+  #resultTitle{font-size:clamp(18px,4vw,26px)}
+  #resultSub{font-size:9px}
+  .xp-result{padding:10px 12px}
+  .xp-row{font-size:8px}
+  .xp-row.total{font-size:9px}
+  .xp-row.total b{font-size:12px}
+  .xp-lv{font-size:8px}
+  .lv-no{font-size:8px}
+  .lv-no b{font-size:11px}
+  .lv-next{font-size:7px}
+  .xp-rounds-title{font-size:7px}
+  .xp-round-row{font-size:7px;padding:3px 0}
+  .xp-round-breakdown{font-size:14px}
+  .xp-round-row b{font-size:8px}
+  .result-btns{gap:8px}
+  .result-btns .btn{font-size:10px;padding:10px 16px}
+  .end-card{padding:0}
+  .end-sign{padding:16px 22px}
+  #endSignText{font-size:clamp(24px,12vw,56px)}
+  .end-card #endContinueBtn{font-size:11px;padding:12px 24px}
+  .modal-card{width:min(340px,92vw);padding:16px;gap:12px}
+  .modal-card h3{font-size:13px}
+  .modal-sub{font-size:18px;margin:-6px 0 0}
+  .pack{padding:12px 14px;font-size:22px}
+  .pack small{font-size:7px}
+  .pack .lucide{width:18px;height:18px}
+  .cb-preview{width:34px;height:48px;font-size:10px}
+  .avatar-grid{grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+  .avatar-upload p{font-size:6px}
+  .name-input{font-size:20px;padding:10px 12px}
+  .xp-pop{font-size:clamp(9px,1.4vw,12px);padding:4px 9px}
+}
+@media (max-width: 900px) and (min-width: 641px){
+  .lobby-main{margin-top:-100px}
+  .tier-carousel{max-width:380px}
+  .tier-track{height:280px}
+  .tier-card{width:300px}
+  .tier-card.pos-center{transform:translate(-50%,-50%) translateZ(50px) scale(1.05)}
+  #game{padding:8px 6px}
+  .hand .card{--cw:clamp(48px,10vw,92px)}
+  .pile{--cw:clamp(52px,10vw,100px)}
+  .round-score{top:clamp(60px,8vw,100px);left:8px;transform:none}
+  #speedLetters{left:10px;top:clamp(60px,8vw,100px);transform:none}
+  .xp-match-panel{right:10px;top:clamp(60px,8vw,100px);transform:none}
+}
+@media (max-height: 600px) and (orientation: landscape){
+  #game{padding:4px 2px;gap:2px}
+  .game-top{padding-bottom:2px;gap:4px}
+  .badge{font-size:8px;padding:6px 8px}
+  .wallet-mini,.xp-mini{font-size:9px;padding:5px 7px}
+  .zone-label{font-size:7px;gap:4px}
+  .stat-chip{font-size:6px;padding:3px 5px}
+  .table-zone{gap:4px;min-height:0}
+  .stuck{font-size:clamp(9px,2vw,12px);padding:6px 10px}
+  .active-row{gap:6px}
+  .pile{--cw:clamp(38px,7vw,64px)}
+  .pile-label{font-size:6px}
+  .backup-row{gap:6px}
+  .backup-slot .pile{--cw:clamp(30px,6vw,48px)}
+  .backup-slot span{font-size:6px}
+  .stats-bar{padding:5px 8px;gap:6px;font-size:6px}
+  .stats-bar b{font-size:12px}
+  .player-row{gap:6px}
+  .draw-stack .card{--cw:clamp(32px,7vw,48px)}
+  .count-badge{font-size:6px;padding:2px 3px}
+  .draw-stack label{font-size:6px}
+  .hand{gap:3px}
+  .hand .card{--cw:clamp(32px,8vw,52px)}
+  #countdownWrap{width:min(200px,85vw);margin:0 auto 4px}
+  .countdown-bar{height:8px}
+  .countdown-num{font-size:clamp(20px,3vw,26px)}
+  .combo-bar{height:12px;width:min(220px,55vw)}
+  .combo-pop{font-size:clamp(8px,1.2vw,10px);padding:4px 8px}
+  .round-score{top:40px;left:6px;transform:none;padding:5px 8px}
+  .round-score .rs-num{font-size:clamp(11px,1.8vw,14px)}
+  #speedLetters{left:6px;top:40px;transform:none;gap:6px}
+  .speed-letter{font-size:clamp(22px,6vw,36px)}
+  .xp-match-panel{right:6px;top:40px;transform:none}
+  .xp-match-panel .xp-mini{font-size:clamp(9px,1.2vw,11px);padding:6px 8px}
+  .combo-announce{display:none}
+  .result-card{padding:20px 14px}
+  #endSignText{font-size:clamp(22px,10vw,48px)}
+  .modal-card{width:min(320px,92vw);padding:14px;gap:10px}
+}
+@media (min-width: 1024px){
+  .lobby-main{margin-top:-160px}
+  .tier-carousel{max-width:420px}
+  .tier-track{height:320px}
+  .tier-card{width:340px}
+  .tier-card.pos-center{transform:translate(-50%,-50%) translateZ(60px) scale(1.1)}
+  .tier-card.pos-right{transform:translate(-50%,-50%) translateX(180px) translateZ(-80px) rotateY(-30deg) scale(.75)}
+  .tier-card.pos-left{transform:translate(-50%,-50%) translateX(-180px) translateZ(-80px) rotateY(30deg) scale(.75)}
+  .tier-card.pos-hidden{transform:translate(-50%,-50%) translateX(300px) translateZ(-200px) rotateY(-45deg) scale(.5)}
+  .tier-card.pos-hidden-left{transform:translate(-50%,-50%) translateX(-300px) translateZ(-200px) rotateY(45deg) scale(.5)}
+}
 
 </style>
 </head>
@@ -1305,7 +1506,7 @@ img,.card{image-rendering:pixelated}
         <li>You can play a card if its number is <b>one higher or one lower</b> than a card in the middle.</li>
         <li>For example, if the middle card is a 5, you can play a 4 or a 6.</li>
         <li>If you cannot play any card, wait until a playable card appears.</li>
-        <li>After playing a card, draw another card from your pile if your hand has fewer cards than the allowed limit.</li>
+        <li>After playing a card, a new card is drawn automatically into your hand.</li>
         <li>The first player to get rid of all their cards wins.</li>
       </ul>
       <p class="rules-note"><b>Example:</b> The middle card is a 7. You have a 6, a 9, and an 8. You can play the 6 or the 8, but not the 9.</p>
@@ -1316,7 +1517,6 @@ img,.card{image-rendering:pixelated}
       <h4>Controls</h4>
       <ul>
         <li><span class="key">CLICK</span>Select one of your cards, then click a center pile to play it.</li>
-        <li><span class="key">SPACE</span>Draw a new card into your hand.</li>
         <li><span class="key">ESC</span>Deselect the card you picked.</li>
       </ul>
     </div>
@@ -2981,6 +3181,26 @@ function playFromHand(idx, pileIdx){
     G.speedLetters.push(SPEED_SEQ[G.speedPlayed - 1]);
     appendSpeedLetter(G.speedLetters[G.speedLetters.length - 1])
   }
+  if(G.pHand.length < 5 && G.pDraw.length){
+    G.pHand.push(G.pDraw.pop());
+    G.drawAnim = { idx: G.pHand.length - 1 };
+    match.draws++;
+    const draws = match.draws;
+    if(draws % 5 === 0){
+      match.drawXp += 5;
+      match.xp += 5;
+      const d0=levelOf(progressXp);
+      setXp(progressXp + 5);
+      if(levelOf(progressXp)>d0)levelUpCelebrate();
+      showPlayXpPop(5);
+      renderMatchXp();
+      triggerDrawMilestone(draws);
+    }
+    const snd = new Audio('music/drawCard.wav');
+    snd.volume = 0.4;
+    snd.play().catch(()=>{});
+    sfx.flip();
+  }
   renderAll();
   if(!G.pHand.length && !G.pDraw.length) endGame('you');
   resetInactivityTimer();
@@ -3418,10 +3638,6 @@ document.addEventListener('keydown', e=>{
   if(e.key === 'Escape' && G && G.selected != null && !G.over){
     G.selected = null;
     renderHand(); renderCenter();
-  }
-  if(e.code === 'Space' && ready()){
-    e.preventDefault();
-    drawOne();
   }
 });
 
